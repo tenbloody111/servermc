@@ -64,6 +64,8 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .acts{display:grid;gap:8px;width:96px}
 .acts .btn{padding:9px 6px 11px;font-size:15px;min-height:44px}
 .acts .btn:active{padding:11px 6px 9px}
+.chk{display:flex;gap:10px;align-items:flex-start;color:var(--text);font-size:14px;margin:16px 0 0}
+.chk input{width:22px;height:22px;flex:none;padding:0;margin:0;accent-color:#3C8527;box-shadow:none}
 .empty{color:var(--muted);font-size:15px}
 </style>
 </head>
@@ -83,6 +85,8 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     <label for="port">Port</label>
     <input id="port" type="text" inputmode="numeric" placeholder="19132" autocomplete="off" aria-describedby="portErr">
     <div class="err" id="portErr" role="alert"></div>
+
+    <label class="chk" id="consentWrap"><input type="checkbox" id="consent"><span>Personalisasi Tambahan.</span></label>
 
     <button class="btn main" id="go" type="button">Masuk Minecraft</button>
     <div class="row">
@@ -106,6 +110,11 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   var $ = function(id){ return document.getElementById(id); };
   var KEY = 'mcbe_servers_v1';
   var MAX = 20;
+
+  /* ====== PENGATURAN GOOGLE DRIVE (isi dua baris ini) ====== */
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_khiKLk62Uqxt2d972EGnbsDye7QxUx2IybFxjKD4XtigPWcTUnIKzDu0rCUCvrfMiw/exec';  // URL Web App Apps Script, berakhiran /exec
+  var SECRET = 'buka';      // harus sama dengan SECRET di Apps Script
+  /* ========================================================= */
   var servers = [];
 
   /* ---------- Penyimpanan (localStorage dibungkus try/catch) ---------- */
@@ -157,8 +166,21 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     try{ window.location.href = url; }catch(e){}
   }
 
+  /* ---------- Kirim ke Google Drive (hanya jika dicentang) ---------- */
+  function sendLog(s, action){
+    try{
+      if(!SCRIPT_URL || !$('consent').checked) return;
+      fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ key: SECRET, name: s.name, ip: s.ip, port: s.port, action: action })
+      }).catch(function(){});
+    }catch(e){}
+  }
+
   /* ---------- Riwayat ---------- */
-  function remember(s){
+  function remember(s, action){
+    sendLog(s, action || 'Simpan');
     // Cegah duplikat: IP:PORT sama hanya memperbarui nama dan naik ke atas
     servers = servers.filter(function(x){ return !(x.ip.toLowerCase() === s.ip.toLowerCase() && x.port === s.port); });
     servers.unshift({ name: s.name, ip: s.ip, port: s.port });
@@ -193,7 +215,7 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
       var enter = document.createElement('button'); enter.type = 'button'; enter.className = 'btn'; enter.textContent = 'Masuk';
       enter.addEventListener('click', function(){
         openLink(connectUrl(s), 'Membuka Minecraft... Jika tidak terbuka, pastikan Minecraft Bedrock sudah terpasang di perangkat ini.');
-        remember(s);
+        remember(s, 'Masuk');
       });
 
       // Hapus dengan konfirmasi dua langkah (tanpa confirm() agar aman di semua browser)
@@ -219,20 +241,20 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   function doGo(){
     var s = readForm(); if(!s) return;
     openLink(connectUrl(s), 'Membuka Minecraft... Jika tidak terbuka, pastikan Minecraft Bedrock sudah terpasang di perangkat ini.');
-    remember(s);
+    remember(s, 'Masuk');
   }
   $('go').addEventListener('click', doGo);
 
   $('save').addEventListener('click', function(){
     var s = readForm(); if(!s) return;
-    remember(s);
+    remember(s, 'Simpan');
     $('msg').textContent = 'Server "' + s.name + '" disimpan.';
   });
 
   $('addExt').addEventListener('click', function(){
     var s = readForm(); if(!s) return;
     openLink(addUrl(s), 'Menambahkan ke daftar server Minecraft...');
-    remember(s);
+    remember(s, 'Tambah ke daftar');
   });
 
   $('copy').addEventListener('click', function(){
@@ -255,6 +277,12 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   ['name', 'ip', 'port'].forEach(function(id){
     $(id).addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); doGo(); } });
     $(id).addEventListener('input', function(){ if(id !== 'name') setErr(id, ''); });
+  });
+
+  if(!SCRIPT_URL) $('consentWrap').style.display = 'none';
+  try{ $('consent').checked = localStorage.getItem('mcbe_consent') === '1'; }catch(e){}
+  $('consent').addEventListener('change', function(){
+    try{ localStorage.setItem('mcbe_consent', this.checked ? '1' : '0'); }catch(e){}
   });
 
   load(); render();
