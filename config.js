@@ -10,13 +10,16 @@ window.APP_CONFIG = {
     menu: 'sounds/Release_ogg.mp3',         // klik menu bawah
     refresh: 'sounds/Snes_pop_ogg.mp3'      // klik Segarkan / Cek Status
   },
+  // Status Featured Server: 'on' = normal, 'locked' = terkunci (perlu PIN), 'off' = dimatikan.
+  FEATURED_MODE: 'locked',
+  // PIN untuk mode 'locked': tepat 4 digit angka. (Catatan: PIN di sini bisa dibaca siapa pun yang membuka file ini.)
+  FEATURED_PIN: '3636',
   // Daftar Featured Server. Kosong = tampil "Coming Soon!".
   // Contoh isi: { name: 'Nama Server', ip: 'play.contoh.com', port: '19132', desc: 'Deskripsi singkat', pin: true },
   // pin: true = server tampil paling atas dengan tanda PIN. Hapus atau isi false jika tidak dipin.
   FEATURED_SERVERS: [
 { name: 'Wasil SMP', ip: 'wasil.my.id', port: '19297', desc: 'Anarchy!', pin: true },
     { name: 'Rechade SMP', ip: 'nibelung.arqonara.com', port: '25451', desc: 'Survival'},
-    { name: 'Tanahlama SMP', ip: 'tanahlama.mineidhost.com', port: '19137', desc: 'Survival'},
-    { name: 'Farnexus', ip: 'farnexus.my.id', port: '30065', desc: 'Survival'}
+    { name: 'Tanahlama SMP', ip: 'tanahlama.mineidhost.com', port: '19137', desc: 'Survival'}
   ]
 };
