@@ -1,275 +1,264 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hosting Minecraft Terbaik!</title>
-  <style>
-    /* -------------------------------------------------------------------------- */
-    /* 1. DESIGN TOKENS                                                           */
-    /* -------------------------------------------------------------------------- */
-    :root {
-      /* Colors */
-      --color-bg: #f3f5f3;
-      --color-surface: #ffffff;
-      --color-border: #e3e7e3;
-      --color-text: #1e2b23;
-      --color-text-muted: #6b776f;
-      --color-accent: #1f6f4a;
-      --color-accent-dark: #164f36;
-      --color-price: #b5651d;
-
-      /* Border Radius */
-      --radius-sm: 6px;
-      --radius-md: 10px;
-
-      /* Spacing Scale */
-      --space-xs: 4px;
-      --space-sm: 8px;
-      --space-md: 12px;
-      --space-lg: 16px;
-      --space-xl: 24px;
-      --space-2xl: 32px;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /* 2. BASE & RESET                                                            */
-    /* -------------------------------------------------------------------------- */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: var(--space-2xl) var(--space-md);
-      background-color: var(--color-bg);
-      color: var(--color-text);
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      line-height: 1.5;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    a {
-      color: var(--color-accent);
-      text-decoration: underline;
-      text-decoration-color: rgba(31, 111, 74, 0.35);
-      text-underline-offset: 3px;
-      font-weight: 600;
-      transition: color 0.15s ease-in-out, text-decoration-color 0.15s ease-in-out;
-    }
-
-    a:hover,
-    a:focus-visible {
-      color: var(--color-accent-dark);
-      text-decoration-color: currentColor;
-    }
-
-    a:focus-visible {
-      outline: 2px solid var(--color-accent);
-      outline-offset: 2px;
-      border-radius: var(--radius-sm);
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /* 3. LAYOUT & CARDS (MOBILE FIRST)                                           */
-    /* -------------------------------------------------------------------------- */
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background-color: var(--color-surface);
-      border-radius: var(--radius-md);
-      padding: var(--space-xl);
-      box-shadow: 0 4px 20px rgba(30, 43, 35, 0.08);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-xl);
-    }
-
-    .card__header {
-      text-align: center;
-    }
-
-    .card__title {
-      font-size: 21px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      margin: 0 0 var(--space-xs);
-    }
-
-    .card__subtitle {
-      font-size: 13px;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-
-    .panel {
-      background-color: var(--color-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-lg);
-    }
-
-    .panel__title {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text-muted);
-      margin: 0 0 var(--space-md);
-    }
-
-    .panel__note {
-      margin: var(--space-lg) 0 0;
-      font-size: 11px;
-      color: var(--color-text-muted);
-      text-align: center;
-      font-style: italic;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /* 4. HOSTER RANKING & OTHER LISTS                                            */
-    /* -------------------------------------------------------------------------- */
-    .ranking-list {
-      list-style: none;
-      counter-reset: rank;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-    }
-
-    .ranking-list__item {
-      counter-increment: rank;
-      display: flex;
-      align-items: center;
-      gap: var(--space-md);
-    }
-
-    .ranking-list__item::before {
-      content: counter(rank);
-      flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background-color: var(--color-accent);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ranking-list__link {
-      flex: 1;
-      min-width: 0;
-      font-size: 14px;
-    }
-
-    .price-tag {
-      color: var(--color-price);
-      font-weight: 600;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .other-hosts {
-      margin-top: var(--space-lg);
-      padding-top: var(--space-lg);
-      border-top: 1px dashed var(--color-border);
-    }
-
-    .other-hosts__label {
-      color: var(--color-text-muted);
-      font-weight: 600;
-      font-size: 13px;
-      display: block;
-      margin-bottom: var(--space-xs);
-    }
-
-    .other-hosts__list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-md);
-    }
-
-    .other-hosts__link {
-      font-size: 14px;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /* 5. RESPONSIVE MEDIA QUERIES                                               */
-    /* -------------------------------------------------------------------------- */
-    @media (max-width: 360px) {
-      .card {
-        padding: var(--space-lg);
-      }
-    }
-
-    /* Desktop / PC Layout (768px ke atas) */
-    @media (min-width: 768px) {
-      body {
-        padding: var(--space-2xl);
-        align-items: center;
-      }
-
-      .card {
-        max-width: 460px;
-        padding: var(--space-2xl);
-        gap: var(--space-2xl);
-      }
-
-      .card__title {
-        font-size: 24px;
-      }
-
-      .card__subtitle {
-        font-size: 14px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masuk Server Minecraft Bedrock</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap">
+<style>
+/* Gaya Ore UI: panel abu gelap, tombol bevel, hijau (hero/primary), putih (secondary), merah (destructive) */
+:root{
+  --bg:#313233; --panel:#48494A; --panel-d:#1E1E1F; --line:#8C8D90; --text:#FFFFFF; --muted:#B1B2B5; --err:#FF8080;
+  --g:#3C8527; --g-hi:#52A535; --g-sh:#2A641C; --g-bd:#1D4D13;
+  --w:#D0D1D4; --w-hi:#ECEDEE; --w-sh:#8C8D90; --w-bd:#1E1E1F;
+  --r:#CA3636; --r-hi:#E35A5A; --r-sh:#8E1F1F; --r-bd:#4F1010;
+  --font:"Pixelify Sans","Noto Sans",ui-monospace,Menlo,Consolas,monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.45}
+main{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+.card{background:var(--panel);border:2px solid var(--panel-d);box-shadow:inset 0 2px 0 #5F6062,0 4px 0 #1E1E1F;margin-bottom:20px}
+.card>.body{padding:6px 16px 18px}
+h1,h2{margin:0;font-weight:700;background:var(--panel-d);padding:14px 16px;border-bottom:2px solid #000}
+h1{font-size:22px;line-height:1.25}
+h2{font-size:18px}
+label{display:block;margin:14px 0 6px;color:var(--muted);font-size:15px}
+input{width:100%;font:inherit;font-size:17px;color:var(--text);background:var(--panel-d);border:2px solid #0f0f10;box-shadow:inset 0 2px 0 #000;padding:11px 12px;border-radius:0;outline:none}
+input::placeholder{color:#7d7e80}
+input:hover{border-color:var(--line)}
+input:focus-visible{border-color:#fff}
+input.bad{border-color:var(--err)}
+.err{color:var(--err);font-size:14px;min-height:20px;margin-top:4px}
+/* Tombol dasar = Primary (hijau) */
+.btn{font:inherit;font-size:17px;font-weight:700;line-height:1.2;color:#fff;background:var(--g);border:2px solid var(--g-bd);
+  box-shadow:inset 0 2px 0 var(--g-hi),inset 0 -4px 0 var(--g-sh);padding:12px 12px 14px;width:100%;cursor:pointer;border-radius:0;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn:hover{background:#44962D}
+.btn:active{padding:14px 12px 12px;box-shadow:inset 0 4px 0 var(--g-sh)}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* Secondary (putih) */
+.btn.alt{background:var(--w);color:#1E1E1F;border-color:var(--w-bd);box-shadow:inset 0 2px 0 var(--w-hi),inset 0 -4px 0 var(--w-sh);text-shadow:none}
+.btn.alt:hover{background:#E1E2E4}
+.btn.alt:active{box-shadow:inset 0 4px 0 var(--w-sh)}
+/* Destructive (merah) */
+.btn.danger{background:var(--r);border-color:var(--r-bd);box-shadow:inset 0 2px 0 var(--r-hi),inset 0 -4px 0 var(--r-sh)}
+.btn.danger:hover{background:#D64242}
+.btn.danger:active{box-shadow:inset 0 4px 0 var(--r-sh)}
+/* Hero (hijau besar untuk aksi utama) */
+.btn.main{font-size:22px;padding:16px 12px 20px;margin-top:20px}
+.btn.main:active{padding:20px 12px 16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.msg{margin-top:14px;font-size:15px;color:var(--muted);min-height:22px}
+.msg a{color:#7FD65F;word-break:break-all}
+.note{font-size:13px;color:var(--muted);margin:16px 0 0}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.item{display:flex;align-items:center;gap:10px;background:var(--panel-d);border:2px solid #0f0f10;padding:10px 12px}
+.info{flex:1;min-width:0;cursor:pointer;background:none;border:0;color:inherit;font:inherit;text-align:left;padding:4px 0}
+.info:hover .nm{text-decoration:underline}
+.info:focus-visible{outline:2px solid #fff}
+.nm{display:block;font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad{display:block;color:var(--muted);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acts{display:grid;gap:8px;width:96px}
+.acts .btn{padding:9px 6px 11px;font-size:15px;min-height:44px}
+.acts .btn:active{padding:11px 6px 9px}
+.empty{color:var(--muted);font-size:15px}
+</style>
 </head>
 <body>
+<main>
+  <section class="card">
+    <h1>Ayo masuk ke server Anda!</h1>
+<div class="body">
 
-  <main class="card">
-    <!-- Header -->
-    <header class="card__header">
-      <h1 class="card__title">Hosting Minecraft Terbaik!</h1>
-      <p class="card__subtitle">100% lokal, Terbagus, Termurah, dan Terpercaya!✨</p>
-    </header>
+    <label for="name">Nama</label>
+    <input id="name" type="text" placeholder="My Server" maxlength="40" autocomplete="off">
 
-    <!-- Hosting Ranking Section -->
-    <section class="panel" aria-label="Peringkat hosting Minecraft">
-      <h2 class="panel__title">Peringkat</h2>
+    <label for="ip">IP / Alamat Server</label>
+    <input id="ip" type="text" placeholder="play.contoh.com" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="ipErr">
+    <div class="err" id="ipErr" role="alert"></div>
 
-      <ol class="ranking-list">
-        <li class="ranking-list__item"><a href="https://nexuscloud.id" class="ranking-list__link" target="_blank" rel="noopener noreferrer">Nexuscloud</a><span class="price-tag">18k</span></li>
-        <li class="ranking-list__item"><a href="https://raehost.com/id/pricing" class="ranking-list__link" target="_blank" rel="noopener noreferrer">Raehost</a><span class="price-tag">17k</span></li>
-        <li class="ranking-list__item"><a href="https://raznar.id/game-hosting/minecraft/general/" class="ranking-list__link" target="_blank" rel="noopener noreferrer">Raznar</a><span class="price-tag">16k</span></li>
-        <li class="ranking-list__item"><a href="https://clients.arqonara.com/products/shared-hosting" class="ranking-list__link" target="_blank" rel="noopener noreferrer">Arqonara</a><span class="price-tag">12k</span></li>
-        <li class="ranking-list__item"><a href="https://zelpstore.id" class="ranking-list__link" target="_blank" rel="noopener noreferrer">Zelpstore</a><span class="price-tag">5k</span></li>
-        <li class="ranking-list__item"><a href="https://billing.mineidhost.com/products/asia-minecraft-basic-hosting" class="ranking-list__link" target="_blank" rel="noopener noreferrer">MineIdhost</a><span class="price-tag">10k</span></li>
-      </ol>
+    <label for="port">Port</label>
+    <input id="port" type="text" inputmode="numeric" placeholder="19132" autocomplete="off" aria-describedby="portErr">
+    <div class="err" id="portErr" role="alert"></div>
 
-      <div class="other-hosts">
-        <span class="other-hosts__label">Lainnya:</span>
-        <ul class="other-hosts__list">
-          <li><a href="https://frcore.web.id/" class="other-hosts__link" target="_blank" rel="noopener noreferrer">FRcore</a></li>
-          <li><a href="https://store.zknesia.my.id/" class="other-hosts__link" target="_blank" rel="noopener noreferrer">Zknesia</a></li>
-          <li><a href="https://bytenodes.icu/" class="other-hosts__link" target="_blank" rel="noopener noreferrer">ByteNodes</a></li>
-        </ul>
-      </div>
+    <button class="btn main" id="go" type="button">Masuk Minecraft</button>
+    <div class="row">
+      <button class="btn alt" id="save" type="button">Simpan Server</button>
+      <button class="btn alt" id="copy" type="button">Salin IP:Port</button>
+    </div>
+    <button class="btn alt" id="addExt" type="button" style="margin-top:10px">Tambahkan ke Daftar Server</button>
 
-      <p class="panel__note">*note: harga diatas dalam bentuk per "1 gb"*</p>
-    </section>
-  </main>
+    <div class="msg" id="msg" aria-live="polite"></div>
+    <p class="note">Fitur ini bekerja di perangkat yang sudah terpasang Minecraft Bedrock (Android, iOS, Windows 10/11).</p>
+  </div></section>
 
+  <section class="card">
+    <h2>Server Tersimpan</h2>
+    <div class="body" style="padding-top:14px"><ul id="list"></ul></div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = 'mcbe_servers_v1';
+  var MAX = 20;
+  var servers = [];
+
+  /* ---------- Penyimpanan (localStorage dibungkus try/catch) ---------- */
+  function load(){
+    try{
+      var r = JSON.parse(localStorage.getItem(KEY) || '[]');
+      if(Array.isArray(r)) servers = r.filter(function(s){ return s && typeof s.ip === 'string' && typeof s.port === 'string'; }).slice(0, MAX);
+    }catch(e){ servers = []; }
+  }
+  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(servers)); }catch(e){} }
+
+  /* ---------- Validasi input ---------- */
+  function setErr(field, text){
+    $(field + 'Err').textContent = text || '';
+    $(field).classList.toggle('bad', !!text);
+  }
+  // Mengembalikan {name, ip, port} jika valid, atau null jika tidak
+  function readForm(){
+    var name = $('name').value.trim().replace(/\|/g, '') || 'My Server';
+    var ip = $('ip').value.trim();
+    var port = $('port').value.trim() || '19132';
+    var ok = true;
+    setErr('ip', ''); setErr('port', '');
+
+    if(!ip){ setErr('ip', 'IP wajib diisi.'); ok = false; }
+    else if(!/^[a-zA-Z0-9]([a-zA-Z0-9.\-]*[a-zA-Z0-9])?$/.test(ip)){
+      setErr('ip', 'IP tidak valid. Hanya huruf, angka, titik, dan tanda minus, tanpa spasi.'); ok = false;
+    }
+    if(!/^\d+$/.test(port) || +port < 1 || +port > 65535){
+      setErr('port', 'Port harus angka 1 sampai 65535.'); ok = false;
+    }
+    if(!ok) return null;
+    return { name: name, ip: ip, port: String(parseInt(port, 10)) };
+  }
+
+  /* ---------- Deep link Minecraft Bedrock ---------- */
+  function connectUrl(s){
+    return 'minecraft://connect/?serverUrl=' + encodeURIComponent(s.ip) + '&serverPort=' + encodeURIComponent(s.port);
+  }
+  function addUrl(s){
+    return 'minecraft://?addExternalServer=' + encodeURIComponent(s.name) + '|' + encodeURIComponent(s.ip + ':' + s.port);
+  }
+  function openLink(url, text){
+    var m = $('msg');
+    m.textContent = text + ' ';
+    var a = document.createElement('a');
+    a.href = url; a.target = '_top'; a.textContent = 'Ketuk di sini jika tidak terbuka.';
+    m.appendChild(a);
+    try{ window.location.href = url; }catch(e){}
+  }
+
+  /* ---------- Riwayat ---------- */
+  function remember(s){
+    // Cegah duplikat: IP:PORT sama hanya memperbarui nama dan naik ke atas
+    servers = servers.filter(function(x){ return !(x.ip.toLowerCase() === s.ip.toLowerCase() && x.port === s.port); });
+    servers.unshift({ name: s.name, ip: s.ip, port: s.port });
+    servers = servers.slice(0, MAX);
+    persist(); render();
+  }
+  function render(){
+    var ul = $('list');
+    ul.textContent = '';
+    if(!servers.length){
+      var li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'Belum ada server tersimpan.';
+      ul.appendChild(li);
+      return;
+    }
+    servers.forEach(function(s, i){
+      var li = document.createElement('li'); li.className = 'item';
+
+      // Klik nama/IP = isi otomatis ke form
+      var info = document.createElement('button'); info.type = 'button'; info.className = 'info';
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = s.name;
+      var ad = document.createElement('span'); ad.className = 'ad'; ad.textContent = s.ip + ':' + s.port;
+      info.appendChild(nm); info.appendChild(ad);
+      info.addEventListener('click', function(){
+        $('name').value = s.name; $('ip').value = s.ip; $('port').value = s.port;
+        setErr('ip', ''); setErr('port', '');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      var acts = document.createElement('div'); acts.className = 'acts';
+      var enter = document.createElement('button'); enter.type = 'button'; enter.className = 'btn'; enter.textContent = 'Masuk';
+      enter.addEventListener('click', function(){
+        openLink(connectUrl(s), 'Membuka Minecraft... Jika tidak terbuka, pastikan Minecraft Bedrock sudah terpasang di perangkat ini.');
+        remember(s);
+      });
+
+      // Hapus dengan konfirmasi dua langkah (tanpa confirm() agar aman di semua browser)
+      var del = document.createElement('button'); del.type = 'button'; del.className = 'btn danger'; del.textContent = 'Hapus';
+      var armed = false, timer;
+      del.addEventListener('click', function(){
+        if(!armed){
+          armed = true; del.textContent = 'Yakin?';
+          timer = setTimeout(function(){ armed = false; del.textContent = 'Hapus'; }, 3000);
+        } else {
+          clearTimeout(timer);
+          servers.splice(i, 1); persist(); render();
+        }
+      });
+
+      acts.appendChild(enter); acts.appendChild(del);
+      li.appendChild(info); li.appendChild(acts);
+      ul.appendChild(li);
+    });
+  }
+
+  /* ---------- Aksi tombol utama ---------- */
+  function doGo(){
+    var s = readForm(); if(!s) return;
+    openLink(connectUrl(s), 'Membuka Minecraft... Jika tidak terbuka, pastikan Minecraft Bedrock sudah terpasang di perangkat ini.');
+    remember(s);
+  }
+  $('go').addEventListener('click', doGo);
+
+  $('save').addEventListener('click', function(){
+    var s = readForm(); if(!s) return;
+    remember(s);
+    $('msg').textContent = 'Server "' + s.name + '" disimpan.';
+  });
+
+  $('addExt').addEventListener('click', function(){
+    var s = readForm(); if(!s) return;
+    openLink(addUrl(s), 'Menambahkan ke daftar server Minecraft...');
+    remember(s);
+  });
+
+  $('copy').addEventListener('click', function(){
+    var s = readForm(); if(!s) return;
+    var text = s.ip + ':' + s.port;
+    function done(){ $('msg').textContent = 'Disalin: ' + text; }
+    function fallback(){
+      var t = document.createElement('textarea');
+      t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); done(); }catch(e){ $('msg').textContent = 'Gagal menyalin. Salin manual: ' + text; }
+      document.body.removeChild(t);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else fallback();
+  });
+
+  // Tekan Enter di kolom mana pun = tombol Masuk
+  ['name', 'ip', 'port'].forEach(function(id){
+    $(id).addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); doGo(); } });
+    $(id).addEventListener('input', function(){ if(id !== 'name') setErr(id, ''); });
+  });
+
+  load(); render();
+})();
+</script>
 </body>
 </html>
