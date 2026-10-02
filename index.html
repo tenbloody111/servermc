@@ -76,7 +76,7 @@ main{padding-bottom:120px}
 .soon span{color:var(--muted)}
 /* Menu bawah berbentuk kapsul, melayang dan mengikuti layar */
 .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:6px;background:#1E1E1F;border:2px solid #000;border-radius:999px;box-shadow:inset 0 2px 0 #3a3b3c,0 8px 18px rgba(0,0,0,.55);z-index:10;max-width:calc(100vw - 20px)}
-.tab{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;white-space:nowrap;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+.tab{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;white-space:nowrap;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
 .tab svg{width:16px;height:16px;fill:currentColor;shape-rendering:crispEdges}
 .tab:hover{color:#fff;background:#2b2c2d}
 .tab[aria-selected="true"]{background:var(--g);color:#fff;box-shadow:inset 0 2px 0 var(--g-hi),inset 0 -3px 0 var(--g-sh)}
@@ -92,6 +92,25 @@ main{padding-bottom:120px}
 .btn.dim,.btn.alt.dim{background:#58595A;color:#9A9B9D;border-color:#2A2A2B;box-shadow:inset 0 2px 0 #6A6B6C,inset 0 -4px 0 #404142;text-shadow:none;cursor:not-allowed}
 .btn.mini.dim{box-shadow:inset 0 2px 0 #6A6B6C,inset 0 -2px 0 #404142}
 .btn.dim:hover,.btn.alt.dim:hover{background:#58595A}
+[hidden]{display:none!important}
+.tab{position:relative}
+.lock{position:absolute;inset:0;border-radius:999px;background:rgba(30,30,31,.96);display:none;align-items:center;justify-content:center;color:#D0D1D4}
+.tab.locked .lock{display:flex}
+.lock svg{width:18px;height:20px;fill:currentColor;shape-rendering:crispEdges}
+.pins{display:flex;gap:10px;justify-content:center;margin:4px 0 6px}
+.pins input{width:56px;height:60px;text-align:center;font-size:26px;padding:0}
+.pins.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.pins.shake{animation:none}}
+.lockov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;border-radius:999px;background:rgba(40,41,42,.97);color:#D0D1D4}
+.lockov svg{width:18px;height:18px;fill:currentColor;shape-rendering:crispEdges}
+.tab.locked .lockov{display:flex}
+.pins{display:flex;justify-content:center;gap:10px;margin-top:18px}
+.pin{width:56px;height:64px;padding:0;text-align:center;font-size:26px}
+.soon .err{text-align:center;margin-top:10px}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
 .empty{color:var(--muted);font-size:15px}
 </style>
 </head>
@@ -138,9 +157,34 @@ main{padding-bottom:120px}
   <section class="card">
     <h2>Featured Server</h2>
     <div class="body" style="padding-top:14px">
+      <div id="gate" hidden>
+        <p id="gateMsg" style="text-align:center;margin:6px 0 14px;font-size:17px"></p>
+        <div id="pinForm" hidden>
+          <div class="pins" id="pins" role="group" aria-label="PIN 4 digit">
+            <input type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 1">
+            <input type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 2">
+            <input type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 3">
+            <input type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 4">
+          </div>
+          <div class="err" id="pinErr" role="alert" style="text-align:center"></div>
+        </div>
+      </div>
+      <div id="featOpen">
       <div id="refreshFWrap" style="text-align:right;margin-bottom:10px" hidden><button class="btn alt mini" id="refreshF" type="button">Segarkan</button></div>
       <div class="soon" id="soon"><b>Coming Soon!</b><span>Server pilihan akan segera hadir.</span></div>
       <ul id="featList"></ul>
+      </div>
+      <div class="soon" id="featOff" hidden><b>Featured Server dimatikan</b><span>Featured Server sedang dimatikan.</span></div>
+      <div class="soon" id="featLock" hidden>
+        <b>Featured Server terkunci</b><span>Featured Server sedang terkunci. Masukkan PIN untuk membuka.</span>
+        <div class="pins" id="pins" role="group" aria-label="PIN 4 digit">
+          <input class="pin" type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 1">
+          <input class="pin" type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 2">
+          <input class="pin" type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 3">
+          <input class="pin" type="password" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 4">
+        </div>
+        <div class="err" id="pinErr" role="alert"></div>
+      </div>
     </div>
   </section>
 </div>
@@ -152,6 +196,8 @@ main{padding-bottom:120px}
   </button>
   <button class="tab" role="tab" id="t-featured" data-tab="featured" aria-selected="false" aria-controls="tab-featured" tabindex="-1" type="button">
     <svg viewBox="0 0 7 7" aria-hidden="true"><path d="M3 0h1v2H3zM0 2h7v1H0zM1 3h5v1H1zM2 4h3v1H2zM1 5h2v1H1zM4 5h2v1H4zM0 6h2v1H0zM5 6h2v1H5z"/></svg><span>Featured Server</span>
+    <span class="lockov" aria-hidden="true"><svg viewBox="0 0 7 8"><path fill-rule="evenodd" d="M2 0h3v1H2zM1 1h1v2H1zM5 1h1v2H5zM0 3h7v5H0zM3 5h1v1H3z"/></svg></span>
+    <span class="lock" aria-hidden="true"><svg viewBox="0 0 8 9"><path fill-rule="evenodd" d="M2 0h4v1H2zM1 1h1v2H1zM6 1h1v2H6zM0 3h8v6H0zM3 5h2v2H3z"/></svg></span>
   </button>
 </nav>
 
@@ -167,6 +213,25 @@ main{padding-bottom:120px}
   var SCRIPT_URL = CFG.SCRIPT_URL || '';
   var SECRET = CFG.SECRET || '';
   var FEATURED = Array.isArray(CFG.FEATURED_SERVERS) ? CFG.FEATURED_SERVERS : [];
+  var MODE = ['on', 'locked', 'off'].indexOf(CFG.FEATURED_MODE) > -1 ? CFG.FEATURED_MODE : 'on';
+  var PIN = String(CFG.FEATURED_PIN || '');
+  if(MODE === 'locked' && !/^\d{4}$/.test(PIN)){
+    MODE = 'off';
+    try{ console.warn('FEATURED_PIN harus tepat 4 digit angka. Featured Server dimatikan.'); }catch(e){}
+  }
+  // Sudah dibuka di sesi ini? (disimpan di sessionStorage, berlaku selama tab browser terbuka)
+  var unlocked = false;
+  try{ unlocked = MODE === 'locked' && sessionStorage.getItem('mcbe_fu') === PIN; }catch(e){}
+  function featState(){ return MODE === 'off' ? 'off' : (MODE === 'locked' && !unlocked ? 'locked' : 'open'); }
+  // Mode Featured Server: 'on' | 'locked' | 'off' (nilai tidak dikenal dianggap 'on')
+  var MODE = ['on', 'locked', 'off'].indexOf(CFG.FEATURED_MODE) >= 0 ? CFG.FEATURED_MODE : 'on';
+  var PIN = String(CFG.FEATURED_PIN || '');
+  if(MODE === 'locked' && !/^\d{4}$/.test(PIN)){
+    console.warn('FEATURED_PIN harus tepat 4 digit angka. Featured Server dimatikan.');
+    MODE = 'off';
+  }
+  var unlocked = false;
+  try{ unlocked = sessionStorage.getItem('mcbe_fu') === '1'; }catch(e){}
   var servers = [];
 
   /* ---------- Penyimpanan (localStorage dibungkus try/catch) ---------- */
@@ -386,8 +451,32 @@ main{padding-bottom:120px}
   });
 
   /* ---------- Featured Server (dari config.js) ---------- */
+  // Terkunci/off: daftar tidak digambar sama sekali dan API status tidak dipanggil
+  function gated(){ return MODE === 'off' || (MODE === 'locked' && !unlocked); }
+  function applyGate(){
+    var g = gated(), tab = $('t-featured');
+    tab.classList.toggle('locked', g);
+    if(g) tab.setAttribute('aria-label', MODE === 'off' ? 'Featured Server dimatikan' : 'Featured Server terkunci');
+    else tab.removeAttribute('aria-label');
+    $('gate').hidden = !g;
+    $('pinForm').hidden = MODE !== 'locked';
+    $('gateMsg').textContent = MODE === 'off' ? 'Featured Server sedang dimatikan.' : 'Featured Server sedang terkunci. Masukkan PIN untuk membuka.';
+    $('featList').hidden = g;
+    if(g){ $('soon').hidden = true; $('refreshFWrap').hidden = true; }
+  }
   function renderFeatured(){
+    var st = featState();
+    $('featOpen').hidden = st !== 'open';
+    $('featLock').hidden = st !== 'locked';
+    $('featOff').hidden = st !== 'off';
+    var tabF = $('t-featured');
+    tabF.classList.toggle('locked', st !== 'open');
+    if(st === 'open') tabF.removeAttribute('aria-label');
+    else tabF.setAttribute('aria-label', st === 'locked' ? 'Featured Server terkunci' : 'Featured Server dimatikan');
+    if(st !== 'open'){ $('featList').textContent = ''; return; }
     var ul = $('featList'); ul.textContent = '';
+    applyGate();
+    if(gated()) return;
     var list = FEATURED.filter(function(f){ return f && /^[a-zA-Z0-9]([a-zA-Z0-9.\-]*[a-zA-Z0-9])?$/.test(String(f.ip || '').trim()); });
     // Server dengan pin: true tampil paling atas (urutan lain tetap sesuai config)
     list = list.map(function(f, i){ return { f: f, i: i }; })
@@ -468,6 +557,54 @@ main{padding-bottom:120px}
   $('refreshF').addEventListener('click', function(){ cache = {}; renderFeatured(); });
   syncDim();
 
+  /* ---------- Kotak PIN Featured Server ---------- */
+  var pinIn = Array.prototype.slice.call(document.querySelectorAll('#pins input'));
+  var fails = 0, lockUntil = 0;
+  function pinClear(){ pinIn.forEach(function(i){ i.value = ''; }); }
+  function startLock(){
+    lockUntil = Date.now() + 30000;
+    pinIn.forEach(function(i){ i.disabled = true; });
+    (function tick(){
+      var left = Math.ceil((lockUntil - Date.now()) / 1000);
+      if(left <= 0){
+        fails = 0; pinIn.forEach(function(i){ i.disabled = false; });
+        $('pinErr').textContent = ''; pinIn[0].focus(); return;
+      }
+      $('pinErr').textContent = 'Terlalu banyak percobaan. Coba lagi dalam ' + left + ' detik.';
+      setTimeout(tick, 500);
+    })();
+  }
+  function pinCheck(){
+    var v = pinIn.map(function(i){ return i.value; }).join('');
+    if(v.length < 4) return;
+    if(v === PIN){
+      unlocked = true; fails = 0; pinClear(); $('pinErr').textContent = '';
+      try{ sessionStorage.setItem('mcbe_fu', '1'); }catch(e){}
+      renderFeatured(); return;
+    }
+    fails++; pinClear();
+    var p = $('pins'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
+    if(fails >= 5) startLock();
+    else { $('pinErr').textContent = 'PIN salah.'; pinIn[0].focus(); }
+  }
+  pinIn.forEach(function(inp, i){
+    inp.addEventListener('input', function(){
+      inp.value = inp.value.replace(/\D/g, '').slice(-1);
+      if(inp.value && i < 3) pinIn[i + 1].focus();
+      pinCheck();
+    });
+    inp.addEventListener('keydown', function(e){
+      if(e.key === 'Backspace' && !inp.value && i > 0){ pinIn[i - 1].focus(); pinIn[i - 1].value = ''; }
+    });
+    inp.addEventListener('paste', function(e){
+      var t = ((e.clipboardData || window.clipboardData).getData('text') || '').replace(/\D/g, '').slice(0, 4);
+      if(!t) return;
+      e.preventDefault();
+      t.split('').forEach(function(ch, k){ pinIn[k].value = ch; });
+      pinIn[Math.min(t.length, 3)].focus(); pinCheck();
+    });
+  });
+
   /* ---------- Efek suara (diatur di config.js) ---------- */
   var SND = CFG.SOUNDS || {};
   var audio = {};
@@ -489,6 +626,61 @@ main{padding-bottom:120px}
     else if(b.id === 'check' || b.id === 'refresh' || b.id === 'refreshF') sfx('refresh');
     else if(b.classList.contains('btn')) sfx('click');
   }, true);
+
+  /* ---------- Kotak PIN Featured Server ---------- */
+  var pinEls = Array.prototype.slice.call(document.querySelectorAll('.pin'));
+  var fails = 0, coolTimer = null;
+  function setPinErr(t){ $('pinErr').textContent = t; }
+  function pinCheck(){
+    var v = pinEls.map(function(e){ return e.value; }).join('');
+    if(v.length < 4) return;
+    if(v === PIN){
+      unlocked = true; fails = 0; setPinErr('');
+      try{ sessionStorage.setItem('mcbe_fu', PIN); }catch(e){}
+      renderFeatured();
+      return;
+    }
+    fails++;
+    pinEls.forEach(function(e){ e.value = ''; });
+    var box = $('pins'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    if(fails >= 5) startCooldown(30);
+    else { setPinErr('PIN salah.'); pinEls[0].focus(); }
+  }
+  // Setelah 5 kali salah beruntun, kunci input 30 detik
+  function startCooldown(sec){
+    pinEls.forEach(function(e){ e.disabled = true; });
+    clearInterval(coolTimer);
+    function tick(){
+      if(sec <= 0){
+        clearInterval(coolTimer); fails = 0; setPinErr('');
+        pinEls.forEach(function(e){ e.disabled = false; });
+        return;
+      }
+      setPinErr('Terlalu banyak percobaan. Coba lagi dalam ' + sec + ' detik.');
+      sec--;
+    }
+    tick();
+    coolTimer = setInterval(tick, 1000);
+  }
+  pinEls.forEach(function(el, i){
+    el.addEventListener('input', function(){
+      el.value = el.value.replace(/\D/g, '').slice(-1);
+      if(el.value && i < 3) pinEls[i + 1].focus();
+      pinCheck();
+    });
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Backspace' && !el.value && i > 0){ pinEls[i - 1].focus(); pinEls[i - 1].value = ''; }
+    });
+    el.addEventListener('paste', function(e){
+      var t = ((e.clipboardData || window.clipboardData).getData('text') || '').replace(/\D/g, '').slice(0, 4);
+      if(!t) return;
+      e.preventDefault();
+      pinEls.forEach(function(x, k){ x.value = t[k] || ''; });
+      pinEls[Math.min(t.length, 3)].focus();
+      pinCheck();
+    });
+    el.addEventListener('focus', function(){ el.select(); });
+  });
 
   load(); render();
 })();
