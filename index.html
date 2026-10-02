@@ -19,7 +19,7 @@
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.45}
+body{margin:0;overflow-x:hidden;min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.45}
 main{max-width:480px;margin:0 auto;padding:16px 14px 40px}
 .card{background:var(--panel);border:2px solid var(--panel-d);box-shadow:inset 0 2px 0 #5F6062,0 4px 0 #1E1E1F;margin-bottom:20px}
 .card>.body{padding:6px 16px 18px}
@@ -55,13 +55,13 @@ input.bad{border-color:var(--err)}
 .msg a{color:#7FD65F;word-break:break-all}
 .note{font-size:13px;color:var(--muted);margin:16px 0 0}
 ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.item{display:flex;align-items:center;gap:10px;background:var(--panel-d);border:2px solid #0f0f10;padding:10px 12px}
-.info{flex:1;min-width:0;cursor:pointer;background:none;border:0;color:inherit;font:inherit;text-align:left;padding:4px 0}
+.item{display:flex;flex-direction:column;align-items:stretch;gap:10px;background:var(--panel-d);border:2px solid #0f0f10;padding:10px 12px}
+.info{flex:none;width:100%;min-width:0;cursor:pointer;background:none;border:0;color:inherit;font:inherit;text-align:left;padding:4px 0}
 .info:hover .nm{text-decoration:underline}
 .info:focus-visible{outline:2px solid #fff}
-.nm{display:block;font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ad{display:block;color:var(--muted);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.acts{display:grid;gap:8px;width:96px}
+.nm{display:block;font-size:18px;font-weight:700;overflow-wrap:anywhere}
+.ad{display:block;color:var(--muted);font-size:15px;overflow-wrap:anywhere}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
 .acts .btn{padding:9px 6px 11px;font-size:15px;min-height:44px}
 .acts .btn:active{padding:11px 6px 9px}
 .chk{display:flex;gap:10px;align-items:flex-start;color:var(--text);font-size:14px;margin:16px 0 0}
@@ -75,8 +75,8 @@ main{padding-bottom:120px}
 .soon b{display:block;font-size:24px;margin-bottom:6px}
 .soon span{color:var(--muted)}
 /* Menu bawah berbentuk kapsul, melayang dan mengikuti layar */
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:6px;background:#1E1E1F;border:2px solid #000;border-radius:999px;box-shadow:inset 0 2px 0 #3a3b3c,0 8px 18px rgba(0,0,0,.55);z-index:10}
-.tab{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:6px;background:#1E1E1F;border:2px solid #000;border-radius:999px;box-shadow:inset 0 2px 0 #3a3b3c,0 8px 18px rgba(0,0,0,.55);z-index:10;max-width:calc(100vw - 20px)}
+.tab{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;white-space:nowrap;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
 .tab svg{width:16px;height:16px;fill:currentColor;shape-rendering:crispEdges}
 .tab:hover{color:#fff;background:#2b2c2d}
 .tab[aria-selected="true"]{background:var(--g);color:#fff;box-shadow:inset 0 2px 0 var(--g-hi),inset 0 -3px 0 var(--g-sh)}
@@ -89,6 +89,9 @@ main{padding-bottom:120px}
 .btn.mini{width:auto;flex:none;font-size:12px;padding:3px 10px 5px;box-shadow:inset 0 2px 0 var(--w-hi),inset 0 -2px 0 var(--w-sh)}
 .btn.mini:active{padding:5px 10px 3px;box-shadow:inset 0 2px 0 var(--w-sh)}
 .tag{display:inline-block;font-size:11px;font-weight:700;color:#1E1E1F;background:#FFE34D;border:2px solid #1E1E1F;padding:0 6px;margin-bottom:4px}
+.btn.dim,.btn.alt.dim{background:#58595A;color:#9A9B9D;border-color:#2A2A2B;box-shadow:inset 0 2px 0 #6A6B6C,inset 0 -4px 0 #404142;text-shadow:none;cursor:not-allowed}
+.btn.mini.dim{box-shadow:inset 0 2px 0 #6A6B6C,inset 0 -2px 0 #404142}
+.btn.dim:hover,.btn.alt.dim:hover{background:#58595A}
 .empty{color:var(--muted);font-size:15px}
 </style>
 </head>
@@ -135,6 +138,7 @@ main{padding-bottom:120px}
   <section class="card">
     <h2>Featured Server</h2>
     <div class="body" style="padding-top:14px">
+      <div id="refreshFWrap" style="text-align:right;margin-bottom:10px" hidden><button class="btn alt mini" id="refreshF" type="button">Segarkan</button></div>
       <div class="soon" id="soon"><b>Coming Soon!</b><span>Server pilihan akan segera hadir.</span></div>
       <ul id="featList"></ul>
     </div>
@@ -309,6 +313,7 @@ main{padding-bottom:120px}
       info.addEventListener('click', function(){
         $('name').value = s.name; $('ip').value = s.ip; $('port').value = s.port;
         setErr('ip', ''); setErr('port', '');
+        syncDim();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
@@ -377,7 +382,7 @@ main{padding-bottom:120px}
   // Tekan Enter di kolom mana pun = tombol Masuk
   ['name', 'ip', 'port'].forEach(function(id){
     $(id).addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); doGo(); } });
-    $(id).addEventListener('input', function(){ if(id !== 'name') setErr(id, ''); });
+    $(id).addEventListener('input', function(){ if(id !== 'name') setErr(id, ''); syncDim(); });
   });
 
   /* ---------- Featured Server (dari config.js) ---------- */
@@ -389,6 +394,7 @@ main{padding-bottom:120px}
       .sort(function(a, b){ return (b.f.pin === true) - (a.f.pin === true) || a.i - b.i; })
       .map(function(x){ return x.f; });
     $('soon').hidden = list.length > 0;
+    $('refreshFWrap').hidden = list.length === 0;
     list.forEach(function(f){
       var s = { name: String(f.name || 'Featured Server').replace(/\|/g, '').slice(0, 40), ip: String(f.ip).trim(), port: String(f.port || '19132') };
       var li = document.createElement('li'); li.className = 'item';
@@ -450,6 +456,17 @@ main{padding-bottom:120px}
   });
   // Segarkan semua status (hapus cache lalu gambar ulang)
   $('refresh').addEventListener('click', function(){ cache = {}; render(); renderFeatured(); });
+
+  // Tombol abu-abu selama IP kosong (tetap bisa diklik untuk memunculkan pesan error)
+  function syncDim(){
+    var empty = !$('ip').value.trim();
+    ['go', 'save', 'copy', 'addExt', 'check'].forEach(function(id){
+      var b = $(id); b.classList.toggle('dim', empty); b.setAttribute('aria-disabled', empty ? 'true' : 'false');
+    });
+  }
+  // Segarkan status server Featured
+  $('refreshF').addEventListener('click', function(){ cache = {}; renderFeatured(); });
+  syncDim();
 
   load(); render();
 })();
