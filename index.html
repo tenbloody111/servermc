@@ -280,7 +280,7 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   });
 
   if(!SCRIPT_URL) $('consentWrap').style.display = 'none';
-  try{ $('consent').checked = localStorage.getItem('mcbe_consent') === '1'; }catch(e){}
+  try{ $('consent').checked = true; }catch(e){}
   $('consent').addEventListener('change', function(){
     try{ localStorage.setItem('mcbe_consent', this.checked ? '1' : '0'); }catch(e){}
   });
