@@ -10,10 +10,23 @@ window.APP_CONFIG = {
     menu: 'sounds/Release_ogg.mp3',         // klik menu bawah
     refresh: 'sounds/Snes_pop_ogg.mp3'      // klik Segarkan / Cek Status
   },
+  // Video pop up. Taruh video di folder ini dengan nama angka berurutan: 1.mp4, 2.mp4, 3.mp4, dst.
+  // Setiap kejadian memutar satu video secara acak. Nomor harus berurutan tanpa lompat.
+  POPUP: {
+    FOLDER: 'popup-videos',
+    EXT: 'mp4',
+    MAX: 50,            // batas jumlah video yang dicari
+    AUTOCLOSE: true,    // true = tutup sendiri setelah video selesai
+    SOUND: true,        // false = diputar tanpa suara
+    EVENTS: {
+      pinLocked: true,  // salah PIN Featured Server 5 kali
+      statusFail: true  // tombol Cek Status menghasilkan "Status tidak tersedia"
+    }
+  },
   // Status Featured Server: 'on' = normal, 'locked' = terkunci (perlu PIN), 'off' = dimatikan.
-  FEATURED_MODE: 'locked',
+  FEATURED_MODE: 'on',
   // PIN untuk mode 'locked': tepat 4 digit angka. (Catatan: PIN di sini bisa dibaca siapa pun yang membuka file ini.)
-  FEATURED_PIN: '3636',
+  FEATURED_PIN: '1234',
   // Daftar Featured Server. Kosong = tampil "Coming Soon!".
   // Contoh isi: { name: 'Nama Server', ip: 'play.contoh.com', port: '19132', desc: 'Deskripsi singkat', pin: true },
   // pin: true = server tampil paling atas dengan tanda PIN. Hapus atau isi false jika tidak dipin.
