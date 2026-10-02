@@ -20,6 +20,10 @@ window.APP_CONFIG = {
   FEATURED_SERVERS: [
 { name: 'Wasil SMP', ip: 'wasil.my.id', port: '19297', desc: 'Anarchy!', pin: true },
     { name: 'Rechade SMP', ip: 'nibelung.arqonara.com', port: '25451', desc: 'Survival'},
-    { name: 'Tanahlama SMP', ip: 'tanahlama.mineidhost.com', port: '19137', desc: 'Survival'}
+    { name: 'Tanahlama SMP', ip: 'tanahlama.mineidhost.com', port: '19137', desc: 'Survival'},
+    { name: 'Farnexus', ip: 'farnexus.my.id', port: '30065', desc: 'Survival-Ekonomi'},
+    { name: 'Entropy SMP', ip: 'pierro.arqonara.com', port: '25356', desc: 'Anarchy-Ekonomi'},
+    { name: 'GHOST SMP', ip: 'premium-8.alstore.space', port: '21002', desc: 'Survival'},
+    { name: 'Vael SMP', ip: 'premium-4.alstore.space', port: '20001', desc: 'Survival'}
   ]
 };
