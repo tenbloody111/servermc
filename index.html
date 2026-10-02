@@ -66,11 +66,35 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .acts .btn:active{padding:11px 6px 9px}
 .chk{display:flex;gap:10px;align-items:flex-start;color:var(--text);font-size:14px;margin:16px 0 0}
 .chk input{width:22px;height:22px;flex:none;padding:0;margin:0;accent-color:#3C8527;box-shadow:none}
+main{padding-bottom:120px}
+.panel{animation:in .25s ease}
+.panel[hidden]{display:none}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}.tab{transition:none}}
+.soon{text-align:center;padding:26px 8px}
+.soon b{display:block;font-size:24px;margin-bottom:6px}
+.soon span{color:var(--muted)}
+/* Menu bawah berbentuk kapsul, melayang dan mengikuti layar */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;padding:6px;background:#1E1E1F;border:2px solid #000;border-radius:999px;box-shadow:inset 0 2px 0 #3a3b3c,0 8px 18px rgba(0,0,0,.55);z-index:10}
+.tab{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s,color .2s}
+.tab svg{width:16px;height:16px;fill:currentColor;shape-rendering:crispEdges}
+.tab:hover{color:#fff;background:#2b2c2d}
+.tab[aria-selected="true"]{background:var(--g);color:#fff;box-shadow:inset 0 2px 0 var(--g-hi),inset 0 -3px 0 var(--g-sh)}
+.tab:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.st{display:block;font-size:14px;color:var(--muted);margin-top:2px}
+.st.on{color:#7FD65F}
+.st.off{color:#FF8080}
+#chk{margin:0;flex:1;min-width:0}
+.chkrow{display:flex;align-items:center;gap:10px;margin-top:6px}
+.btn.mini{width:auto;flex:none;font-size:12px;padding:3px 10px 5px;box-shadow:inset 0 2px 0 var(--w-hi),inset 0 -2px 0 var(--w-sh)}
+.btn.mini:active{padding:5px 10px 3px;box-shadow:inset 0 2px 0 var(--w-sh)}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:#1E1E1F;background:#FFE34D;border:2px solid #1E1E1F;padding:0 6px;margin-bottom:4px}
 .empty{color:var(--muted);font-size:15px}
 </style>
 </head>
 <body>
 <main>
+<div class="panel" id="tab-connect" role="tabpanel" aria-labelledby="t-connect">
   <section class="card">
     <h1>Ayo masuk ke server Anda!</h1>
 <div class="body">
@@ -85,6 +109,8 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     <label for="port">Port</label>
     <input id="port" type="text" inputmode="numeric" placeholder="19132" autocomplete="off" aria-describedby="portErr">
     <div class="err" id="portErr" role="alert"></div>
+
+    <div class="chkrow"><button class="btn alt mini" id="check" type="button">Cek Status</button><span class="st" id="chk" aria-live="polite"></span></div>
 
     <label class="chk" id="consentWrap"><input type="checkbox" id="consent"><span>Personalisasi Tambahan.</span></label>
 
@@ -101,20 +127,42 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 
   <section class="card">
     <h2>Server Tersimpan</h2>
-    <div class="body" style="padding-top:14px"><ul id="list"></ul></div>
+    <div class="body" style="padding-top:14px"><button class="btn alt" id="refresh" type="button" style="margin-bottom:12px">Segarkan Status</button><ul id="list"></ul></div>
   </section>
+</div>
+
+<div class="panel" id="tab-featured" role="tabpanel" aria-labelledby="t-featured" hidden>
+  <section class="card">
+    <h2>Featured Server</h2>
+    <div class="body" style="padding-top:14px">
+      <div class="soon" id="soon"><b>Coming Soon!</b><span>Server pilihan akan segera hadir.</span></div>
+      <ul id="featList"></ul>
+    </div>
+  </section>
+</div>
 </main>
 
+<nav class="nav" role="tablist" aria-label="Menu">
+  <button class="tab" role="tab" id="t-connect" data-tab="connect" aria-selected="true" aria-controls="tab-connect" type="button">
+    <svg viewBox="0 0 7 7" aria-hidden="true"><path d="M0 3h5v1H0zM4 1h1v1H4zM5 2h1v1H5zM6 3h1v1H6zM5 4h1v1H5zM4 5h1v1H4z"/></svg><span>Connect</span>
+  </button>
+  <button class="tab" role="tab" id="t-featured" data-tab="featured" aria-selected="false" aria-controls="tab-featured" tabindex="-1" type="button">
+    <svg viewBox="0 0 7 7" aria-hidden="true"><path d="M3 0h1v2H3zM0 2h7v1H0zM1 3h5v1H1zM2 4h3v1H2zM1 5h2v1H1zM4 5h2v1H4zM0 6h2v1H0zM5 6h2v1H5z"/></svg><span>Featured Server</span>
+  </button>
+</nav>
+
+<script src="config.js"></script>
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var KEY = 'mcbe_servers_v1';
   var MAX = 20;
 
-  /* ====== PENGATURAN GOOGLE DRIVE (isi dua baris ini) ====== */
-  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_khiKLk62Uqxt2d972EGnbsDye7QxUx2IybFxjKD4XtigPWcTUnIKzDu0rCUCvrfMiw/exec';  // URL Web App Apps Script, berakhiran /exec
-  var SECRET = 'buka';      // harus sama dengan SECRET di Apps Script
-  /* ========================================================= */
+  /* Pengaturan dibaca dari config.js */
+  var CFG = window.APP_CONFIG || {};
+  var SCRIPT_URL = CFG.SCRIPT_URL || '';
+  var SECRET = CFG.SECRET || '';
+  var FEATURED = Array.isArray(CFG.FEATURED_SERVERS) ? CFG.FEATURED_SERVERS : [];
   var servers = [];
 
   /* ---------- Penyimpanan (localStorage dibungkus try/catch) ---------- */
@@ -178,6 +226,59 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     }catch(e){}
   }
 
+  /* ---------- Status server (API mcstatus.io, Bedrock) ---------- */
+  var API = 'https://api.mcstatus.io/v2/status/bedrock/';
+  var cache = {};            // simpan hasil sementara (API sendiri cache 5 menit)
+  var queue = [], running = 0;
+
+  function getStatus(ip, port){
+    var k = (ip + ':' + port).toLowerCase(), c = cache[k];
+    if(c && Date.now() - c.t < c.ttl) return Promise.resolve(c.v);
+    return fetch(API + encodeURIComponent(ip) + ':' + encodeURIComponent(port))
+      .then(function(r){ if(!r.ok) throw new Error('http'); return r.json(); })
+      .then(function(d){
+        var p = d && d.players || {};
+        var v = { ok: true, online: !!d.online,
+          pl: typeof p.online === 'number' ? p.online : null,
+          max: typeof p.max === 'number' ? p.max : null,
+          ver: d.version && d.version.name ? String(d.version.name) : '',
+          motd: d.motd && d.motd.clean ? String(d.motd.clean).split('\n')[0].trim() : '' };
+        cache[k] = { t: Date.now(), ttl: 300000, v: v };
+        return v;
+      })
+      .catch(function(){
+        var v = { ok: false };
+        cache[k] = { t: Date.now(), ttl: 60000, v: v };  // kegagalan diingat 1 menit agar tidak membanjiri API
+        return v;
+      });
+  }
+  // Antrean: maksimal 3 permintaan sekaligus
+  function queueStatus(ip, port, cb){ queue.push([ip, port, cb]); pump(); }
+  function pump(){
+    while(running < 3 && queue.length){
+      running++;
+      (function(j){
+        getStatus(j[0], j[1]).then(j[2]).catch(function(){}).then(function(){ running--; pump(); });
+      })(queue.shift());
+    }
+  }
+  function newBadge(s){
+    var el = document.createElement('span'); el.className = 'st'; el.textContent = 'Memeriksa status...';
+    queueStatus(s.ip, s.port, function(v){ applyStatus(el, v); });
+    return el;
+  }
+  // Teks status memakai textContent (aman dari isi MOTD server)
+  function applyStatus(el, v, detail){
+    el.classList.remove('on', 'off');
+    if(!v.ok){ el.textContent = 'Status tidak tersedia'; return; }
+    if(!v.online){ el.classList.add('off'); el.textContent = '\u25CF Offline'; return; }
+    el.classList.add('on');
+    var t = '\u25CF Online';
+    if(v.pl !== null) t += ' \u00B7 ' + v.pl + (v.max !== null ? '/' + v.max : '') + ' pemain';
+    if(detail){ if(v.ver) t += ' \u00B7 ' + v.ver; if(v.motd) t += ' \u00B7 ' + v.motd; }
+    el.textContent = t.slice(0, 140);
+  }
+
   /* ---------- Riwayat ---------- */
   function remember(s, action){
     sendLog(s, action || 'Simpan');
@@ -204,7 +305,7 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
       var info = document.createElement('button'); info.type = 'button'; info.className = 'info';
       var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = s.name;
       var ad = document.createElement('span'); ad.className = 'ad'; ad.textContent = s.ip + ':' + s.port;
-      info.appendChild(nm); info.appendChild(ad);
+      info.appendChild(nm); info.appendChild(ad); info.appendChild(newBadge(s));
       info.addEventListener('click', function(){
         $('name').value = s.name; $('ip').value = s.ip; $('port').value = s.port;
         setErr('ip', ''); setErr('port', '');
@@ -279,11 +380,76 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
     $(id).addEventListener('input', function(){ if(id !== 'name') setErr(id, ''); });
   });
 
+  /* ---------- Featured Server (dari config.js) ---------- */
+  function renderFeatured(){
+    var ul = $('featList'); ul.textContent = '';
+    var list = FEATURED.filter(function(f){ return f && /^[a-zA-Z0-9]([a-zA-Z0-9.\-]*[a-zA-Z0-9])?$/.test(String(f.ip || '').trim()); });
+    // Server dengan pin: true tampil paling atas (urutan lain tetap sesuai config)
+    list = list.map(function(f, i){ return { f: f, i: i }; })
+      .sort(function(a, b){ return (b.f.pin === true) - (a.f.pin === true) || a.i - b.i; })
+      .map(function(x){ return x.f; });
+    $('soon').hidden = list.length > 0;
+    list.forEach(function(f){
+      var s = { name: String(f.name || 'Featured Server').replace(/\|/g, '').slice(0, 40), ip: String(f.ip).trim(), port: String(f.port || '19132') };
+      var li = document.createElement('li'); li.className = 'item';
+      var info = document.createElement('div'); info.className = 'info'; info.style.cursor = 'default';
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = s.name;
+      info.appendChild(nm);
+      if(f.pin === true){ var pt = document.createElement('span'); pt.className = 'tag'; pt.textContent = 'PIN'; info.insertBefore(pt, nm); }
+      if(f.desc){ var d = document.createElement('span'); d.className = 'ad'; d.textContent = String(f.desc); info.appendChild(d); }
+      var ad = document.createElement('span'); ad.className = 'ad'; ad.textContent = s.ip + ':' + s.port; info.appendChild(ad); info.appendChild(newBadge(s));
+      var acts = document.createElement('div'); acts.className = 'acts';
+      var enter = document.createElement('button'); enter.type = 'button'; enter.className = 'btn'; enter.textContent = 'Masuk';
+      enter.addEventListener('click', function(){
+        openLink(connectUrl(s), 'Membuka Minecraft...');
+        sendLog(s, 'Masuk (featured)');
+      });
+      var sv = document.createElement('button'); sv.type = 'button'; sv.className = 'btn alt'; sv.textContent = 'Simpan';
+      sv.addEventListener('click', function(){
+        remember(s, 'Simpan (featured)');
+        sv.textContent = 'Tersimpan';
+        setTimeout(function(){ sv.textContent = 'Simpan'; }, 1500);
+      });
+      acts.appendChild(enter); acts.appendChild(sv);
+      li.appendChild(info); li.appendChild(acts); ul.appendChild(li);
+    });
+  }
+
+  /* ---------- Pindah tab tanpa reload ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function showTab(name){
+    tabs.forEach(function(t){
+      var on = t.dataset.tab === name;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      $('tab-' + t.dataset.tab).hidden = !on;
+    });
+    window.scrollTo({ top: 0 });
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ showTab(t.dataset.tab); });
+    t.addEventListener('keydown', function(e){
+      if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      showTab(n.dataset.tab); n.focus();
+    });
+  });
+  renderFeatured();
+
   if(!SCRIPT_URL) $('consentWrap').style.display = 'none';
   try{ $('consent').checked = true; }catch(e){}
   $('consent').addEventListener('change', function(){
     try{ localStorage.setItem('mcbe_consent', this.checked ? '1' : '0'); }catch(e){}
   });
+
+  // Tombol Cek Status di form
+  $('check').addEventListener('click', function(){
+    var s = readForm(); if(!s) return;
+    var el = $('chk'); el.classList.remove('on', 'off'); el.textContent = 'Memeriksa status...';
+    getStatus(s.ip, s.port).then(function(v){ applyStatus(el, v, true); });
+  });
+  // Segarkan semua status (hapus cache lalu gambar ulang)
+  $('refresh').addEventListener('click', function(){ cache = {}; render(); renderFeatured(); });
 
   load(); render();
 })();
