@@ -468,6 +468,28 @@ main{padding-bottom:120px}
   $('refreshF').addEventListener('click', function(){ cache = {}; renderFeatured(); });
   syncDim();
 
+  /* ---------- Efek suara (diatur di config.js) ---------- */
+  var SND = CFG.SOUNDS || {};
+  var audio = {};
+  Object.keys(SND).forEach(function(n){
+    try{ audio[n] = new Audio(SND[n]); audio[n].preload = 'auto'; }catch(e){}
+  });
+  function sfx(n){
+    try{
+      var a = audio[n]; if(!a) return;
+      a.currentTime = 0;
+      var p = a.play(); if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  // Satu pendengar untuk semua tombol (termasuk tombol yang dibuat belakangan)
+  document.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if(!b) return;
+    if(b.classList.contains('tab')) sfx('menu');
+    else if(b.id === 'check' || b.id === 'refresh' || b.id === 'refreshF') sfx('refresh');
+    else if(b.classList.contains('btn')) sfx('click');
+  }, true);
+
   load(); render();
 })();
 </script>
