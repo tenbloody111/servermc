@@ -24,9 +24,9 @@ window.APP_CONFIG = {
     }
   },
   // Status Featured Server: 'on' = normal, 'locked' = terkunci (perlu PIN), 'off' = dimatikan.
-  FEATURED_MODE: 'on',
+  FEATURED_MODE: 'locked',
   // PIN untuk mode 'locked': tepat 4 digit angka. (Catatan: PIN di sini bisa dibaca siapa pun yang membuka file ini.)
-  FEATURED_PIN: '1234',
+  FEATURED_PIN: '3636',
   // Daftar Featured Server. Kosong = tampil "Coming Soon!".
   // Contoh isi: { name: 'Nama Server', ip: 'play.contoh.com', port: '19132', desc: 'Deskripsi singkat', pin: true },
   // pin: true = server tampil paling atas dengan tanda PIN. Hapus atau isi false jika tidak dipin.
