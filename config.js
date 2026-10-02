@@ -8,5 +8,8 @@ window.APP_CONFIG = {
   // Contoh isi: { name: 'Nama Server', ip: 'play.contoh.com', port: '19132', desc: 'Deskripsi singkat', pin: true },
   // pin: true = server tampil paling atas dengan tanda PIN. Hapus atau isi false jika tidak dipin.
   FEATURED_SERVERS: [
+    { name: 'Wasil SMP', ip: 'wasil.my.id', port: '19297', desc: 'Anarchy!', pin: true },
+    { name: 'Rechade SMP', ip: 'nibelung.arqonara.com', port: '25451', desc: 'Survival'},
+    { name: 'Tanahlama SMP', ip: 'tanahlama.mineidhost.com', port: '19137', desc: 'Survival', pin: true }
   ]
 };
