@@ -109,6 +109,14 @@ main{padding-bottom:120px}
 .fopt{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 10px;margin:0;color:var(--text);font-size:15px;cursor:pointer}
 .fopt:hover{background:#2b2c2d}
 .fopt input{width:22px;height:22px;flex:none;padding:0;margin:0;accent-color:#3C8527;box-shadow:none}
+/* Video pop up */
+.vpop{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));background:rgba(0,0,0,.8)}
+.vbox{position:relative;width:min(100%,560px);background:var(--panel);border:2px solid #000;box-shadow:inset 0 2px 0 #5F6062,0 6px 0 #1E1E1F}
+.vhead{display:flex;justify-content:flex-end;background:var(--panel-d);border-bottom:2px solid #000;padding:6px}
+.vclose{width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;font-size:20px}
+.vclose svg{width:16px;height:16px;fill:currentColor;shape-rendering:crispEdges}
+.vbox video{display:block;width:100%;max-height:70vh;background:#000}
+.vplay{position:absolute;left:50%;top:calc(50% + 24px);transform:translate(-50%,-50%);width:auto;padding:14px 28px 16px}
 .empty{color:var(--muted);font-size:15px}
 </style>
 </head>
@@ -192,6 +200,14 @@ main{padding-bottom:120px}
     <span class="lockov" aria-hidden="true"><svg viewBox="0 0 7 8"><path fill-rule="evenodd" d="M2 0h3v1H2zM1 1h1v2H1zM5 1h1v2H5zM0 3h7v5H0zM3 5h1v1H3z"/></svg></span>
   </button>
 </nav>
+
+<div class="vpop" id="vpop" role="dialog" aria-modal="true" aria-label="Video" hidden>
+  <div class="vbox">
+    <div class="vhead"><button class="btn alt vclose" id="vclose" type="button" aria-label="Tutup video"><svg viewBox="0 0 7 7" aria-hidden="true"><path d="M0 0h2v1h1v1h1V1h1V0h2v2H6v1H5v1h1v1h1v2H5V6H4V5H3v1H2v1H0V5h1V4h1V3H1V2H0z"/></svg></button></div>
+    <video id="vid" playsinline webkit-playsinline preload="none"></video>
+    <button class="btn vplay" id="vplay" type="button" hidden>Putar</button>
+  </div>
+</div>
 
 <script src="config.js"></script>
 <script>
@@ -515,7 +531,7 @@ main{padding-bottom:120px}
   $('check').addEventListener('click', function(){
     var s = readForm(); if(!s) return;
     var el = $('chk'); el.classList.remove('on', 'off'); el.textContent = 'Memeriksa status...';
-    getStatus(s.ip, s.port).then(function(v){ applyStatus(el, v, true); });
+    getStatus(s.ip, s.port).then(function(v){ applyStatus(el, v, true); if(!v.ok) popupVideo('statusFail'); });
   });
   // Segarkan semua status (hapus cache lalu gambar ulang)
   $('refresh').addEventListener('click', function(){ cache = {}; render(); renderFeatured(); });
@@ -530,6 +546,87 @@ main{padding-bottom:120px}
   // Segarkan status server Featured
   $('refreshF').addEventListener('click', function(){ cache = {}; renderFeatured(); });
   syncDim();
+
+  /* ---------- Video pop up (folder dan kejadian diatur di config.js) ---------- */
+  var PC = CFG.POPUP || {};
+  var P_DIR = String(PC.FOLDER || 'popup-videos').replace(/\/+$/, '');
+  var P_EXT = String(PC.EXT || 'mp4').replace(/[^a-zA-Z0-9]/g, '') || 'mp4';
+  var P_MAX = Math.min(Math.max(parseInt(PC.MAX, 10) || 50, 1), 200);
+  var P_EV = PC.EVENTS || {};
+  var P_AUTOCLOSE = PC.AUTOCLOSE !== false;
+  var P_SOUND = PC.SOUND !== false;
+  var vFind = null, vFiles = [], vLast = -1, vOpen = false, vFocus = null, vCool = {};
+  function vUrl(n){ return P_DIR + '/' + n + '.' + P_EXT; }
+  // Cek apakah file nomor n ada: muat hanya header video (kecil), bukan seluruh video
+  function vProbe(n){
+    return new Promise(function(res){
+      var v = document.createElement('video'), done = false, t;
+      function fin(ok){ if(done) return; done = true; clearTimeout(t); v.removeAttribute('src'); try{ v.load(); }catch(e){} res(ok); }
+      v.preload = 'metadata'; v.muted = true;
+      v.onloadedmetadata = function(){ fin(true); };
+      v.onerror = function(){ fin(false); };
+      t = setTimeout(function(){ fin(false); }, 6000);
+      v.src = vUrl(n);
+    });
+  }
+  // Cari 1.mp4, 2.mp4, 3.mp4, ... sampai ada nomor yang tidak ditemukan
+  function discoverVideos(){
+    if(vFind) return vFind;
+    vFind = new Promise(function(done){
+      var n = 1;
+      (function next(){
+        if(n > P_MAX) return done();
+        vProbe(n).then(function(ok){ if(!ok) return done(); vFiles.push(n); n++; next(); });
+      })();
+    });
+    return vFind;
+  }
+  function popupVideo(evt){
+    if(P_EV[evt] === false || vOpen) return;
+    var now = Date.now();
+    if(vCool[evt] && now - vCool[evt] < 10000) return;   // kejadian sama tidak mengulang dalam 10 detik
+    vCool[evt] = now;
+    discoverVideos().then(function(){
+      if(!vFiles.length || vOpen) return;
+      // Acak, tidak memutar video yang sama dua kali berturut-turut (jika videonya lebih dari satu)
+      var pool = vFiles.length > 1 ? vFiles.filter(function(n){ return n !== vLast; }) : vFiles;
+      var n = pool[Math.floor(Math.random() * pool.length)];
+      vLast = n; vOpen = true; vFocus = document.activeElement;
+      var v = $('vid');
+      $('vplay').hidden = true;
+      $('vpop').hidden = false;
+      v.muted = !P_SOUND;
+      v.src = vUrl(n);
+      var pr = v.play();
+      if(pr && pr.catch) pr.catch(function(){
+        if(!vOpen) return;
+        v.muted = true;                                   // suara diblokir browser: coba tanpa suara
+        var p2 = v.play();
+        if(p2 && p2.catch) p2.catch(function(){ if(vOpen) $('vplay').hidden = false; });
+      });
+      $('vclose').focus();
+    });
+  }
+  function closeVideo(){
+    if(!vOpen) return;
+    var v = $('vid');
+    try{ v.pause(); }catch(e){}
+    v.removeAttribute('src'); try{ v.load(); }catch(e){}
+    $('vpop').hidden = true; vOpen = false;
+    try{ if(vFocus && vFocus.focus) vFocus.focus(); }catch(e){}
+  }
+  $('vclose').addEventListener('click', closeVideo);
+  $('vpop').addEventListener('click', function(e){ if(e.target === $('vpop')) closeVideo(); });
+  $('vid').addEventListener('ended', function(){ if(P_AUTOCLOSE) closeVideo(); });
+  $('vid').addEventListener('error', function(){ if(vOpen && $('vid').getAttribute('src')) closeVideo(); });
+  $('vplay').addEventListener('click', function(){
+    var v = $('vid'); v.muted = !P_SOUND;
+    var p = v.play(); if(p && p.catch) p.catch(function(){});
+    $('vplay').hidden = true;
+  });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeVideo(); });
+  // Cari daftar video di latar belakang setelah halaman selesai dimuat
+  window.addEventListener('load', function(){ setTimeout(discoverVideos, 800); });
 
   /* ---------- Efek suara (diatur di config.js) ---------- */
   var SND = CFG.SOUNDS || {};
@@ -599,6 +696,7 @@ main{padding-bottom:120px}
   // Setelah 5 kali salah beruntun, kunci input 30 detik
   function startCooldown(sec){
     pinEls.forEach(function(e){ e.disabled = true; });
+    popupVideo('pinLocked');
     clearInterval(coolTimer);
     function tick(){
       if(sec <= 0){
